@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{62608c8b-fed5-4163-89b4-4699ce3b1364}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="data">
+      <UniqueIdentifier>{43a3efe2-5d04-4d72-bdb2-f91f0b75fad7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="data\rectangulos">
+      <UniqueIdentifier>{70a8dad0-df29-4e49-8e4f-70c3bd208fa9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="data\rectangulos-ordered">
+      <UniqueIdentifier>{f57e4f6e-6c1d-4b69-929d-a4941f1ba906}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="main">
+      <UniqueIdentifier>{bff38343-42c4-4a55-be0b-c28e6e539a9f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ArchivosRectangulo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Rectangulo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AuxFunctions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>main</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Rectangulo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ArchivosRectangulo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AuxFunctions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ordered-rectangles.bin">
+      <Filter>data\rectangulos-ordered</Filter>
+    </None>
+    <None Include="rectangles.bin">
+      <Filter>data\rectangulos</Filter>
+    </None>
+  </ItemGroup>
+</Project>
