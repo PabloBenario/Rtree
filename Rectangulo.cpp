@@ -31,3 +31,7 @@ void Rectangulo::imprimir() const {
     std::cout << "[x1: " << x1 << ", y1: " << y1 << ", x2: " << x2 << ", y2: " << y2 << ", centroX: " << centroX << "]" << std::endl;
 }
 
+bool Rectangulo::intersecta(const Rectangulo& otro) const {
+    return !(x1 > otro.x2 || x2 < otro.x1 || y1 > otro.y2 || y2 < otro.y1);
+}
+
