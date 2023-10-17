@@ -23,7 +23,7 @@ struct Nodo {
 };
 
 
-std::vector<Nodo> crearNodosDesdeGrupos(const std::vector<std::vector<Rectangulo>>& grupos);
+std::vector<Nodo*> crearNodosDesdeGrupos(const std::vector<std::vector<Rectangulo>>& grupos);
 
 void imprimirMBRsDeNodos(const std::vector<Nodo>& nodos);
 

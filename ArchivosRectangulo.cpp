@@ -159,18 +159,6 @@ std::vector<Rectangulo> leerRectangulos(const std::string& nombreArchivo) {
 
 
 
-std::vector<std::vector<Rectangulo>> agruparRectangulos(const std::vector<Rectangulo>& rectangulos, size_t M) {
-    std::vector<std::vector<Rectangulo>> grupos;
-
-    // Iteramos sobre el vector principal y vamos agregando rectángulos a cada grupo
-    for (size_t i = 0; i < rectangulos.size(); i += M) {
-        // Uso de `begin() + i` y `begin() + i + M` para delimitar el rango de rectángulos a agregar.
-        // La función `min` se utiliza para manejar el caso en que el último grupo tenga menos de M rectángulos.
-        grupos.emplace_back(rectangulos.begin() + i, rectangulos.begin() + std::min(i + M, rectangulos.size()));
-    }
-
-    return grupos;
-}
 
 
 

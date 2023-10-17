@@ -19,17 +19,17 @@ Rectangulo Nodo::calcularMBR() const {
     return Rectangulo(minX, minY, maxX - minX, maxY - minY);
 }
 
-std::vector<Nodo> crearNodosDesdeGrupos(const std::vector<std::vector<Rectangulo>>& grupos) {
-    std::vector<Nodo> nodos;
+std::vector<Nodo*> crearNodosDesdeGrupos(const std::vector<std::vector<Rectangulo>>& grupos) {
+    std::vector<Nodo*> nodos;
 
     // Por cada grupo de rectángulos, crea un nodo
     for (const auto& grupo : grupos) {
-        Nodo nodoActual;
+        Nodo* nodoActual = new Nodo(); // Crea un Nodo en el heap
 
         // Por cada rectángulo en el grupo, crea una entrada y agrégala al nodo
         for (const Rectangulo& rect : grupo) {
             Entrada entrada(rect);
-            nodoActual.entradas.push_back(entrada);
+            nodoActual->entradas.push_back(entrada);
         }
 
         nodos.push_back(nodoActual);
@@ -37,6 +37,7 @@ std::vector<Nodo> crearNodosDesdeGrupos(const std::vector<std::vector<Rectangulo
 
     return nodos;
 }
+
 
 void imprimirMBRsDeNodos(const std::vector<Nodo>& nodos) {
     int nodoNumero = 1;  // Contador para indicar el número de nodo.

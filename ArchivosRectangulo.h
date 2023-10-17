@@ -43,10 +43,6 @@ std::vector<Rectangulo> leerRectangulos(const std::string& nombreArchivo);
 
 
 
-std::vector<std::vector<Rectangulo>> agruparRectangulos(const std::vector<Rectangulo>& rectangulos, size_t M);
-
-
-
 void ordenarPorCentroX(std::vector<Rectangulo>& rectangulos);
 
 

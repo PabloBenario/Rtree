@@ -24,4 +24,5 @@ public:
     double getArea() const;
     void imprimir() const;
     bool intersecta(const Rectangulo& otro) const;
+    void imprimirDim() const;
 };
