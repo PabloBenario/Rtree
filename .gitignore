@@ -5,3 +5,5 @@ x64/
 *.ilk
 *.log
 *.tlog/ 
+*.bin
+*.txt

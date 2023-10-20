@@ -7,8 +7,10 @@
 #include "Rectangulo.h"
 #include "AuxFunctions.h"
 
-const unsigned int M = 4;  // Capacidad máxima de HIJOS de un nodo.
-const unsigned int N = 14; 
+
+#include <chrono>
+
+const unsigned int M = 102;  // Capacidad máxima de HIJOS de un nodo.
 
 std::vector<std::vector<Rectangulo>> agruparRectangulos(const std::vector<Rectangulo>& rectangulos) {
     std::vector<std::vector<Rectangulo>> grupos;
@@ -38,7 +40,7 @@ Nodo* construirRtree(const std::vector<Rectangulo>& rectangulosOrdenados) {
             raiz->entradas.push_back(Entrada(nodo->calcularMBR(), nodo));
 
         }
-        raiz->entradas.size();
+
         return raiz;
     }
 
@@ -262,234 +264,183 @@ void imprimirRTree2(const Nodo* raiz) {
 
 
 
+std::vector<std::vector<Rectangulo>*> cargarVectoresDesdeArchivos(const std::vector<unsigned long long>& numeros) {
+    std::vector<std::vector<Rectangulo>*> vectores;
+
+    for (unsigned long long num : numeros) {
+        // Construye el nombre del archivo en base al número
+        std::string filename = "ordered-rectangles" + std::to_string(num) + ".bin";
+
+        // Lee los rectángulos desde el archivo
+        std::vector<Rectangulo> rectangulos = leerRectangulos(filename);
+
+        // Crea un nuevo vector en el heap y le copia los rectángulos
+        std::vector<Rectangulo>* vectorEnHeap = new std::vector<Rectangulo>(rectangulos);
+
+        // Agrega el puntero al vector en vectores
+        vectores.push_back(vectorEnHeap);
+    }
+
+    return vectores;
+}
+
+
+
+std::vector<Nodo*> construirRTreesDesdeVectores(const std::vector<std::vector<Rectangulo>*>& vectoresDeRectangulos) {
+    std::vector<Nodo*> rtrees;
+
+    for (const auto& rectangulos : vectoresDeRectangulos) {
+        Nodo* rtree = construirRtree(*rectangulos);
+        rtrees.push_back(rtree);
+    }
+
+    return rtrees;
+}
+
+
+void guardarTodosLosRTrees(const std::vector<Nodo*>& rtrees) {
+    for (size_t i = 0; i < rtrees.size(); ++i) {
+        std::string filename = "RTree_" + std::to_string(i) + ".txt";
+        guardarRTree(rtrees[i], filename);
+        std::cout << "Se guardó el R-tree " << i << " en el archivo " << filename << std::endl;
+    }
+}
+
+
+
+
+
+
+std::vector<Rectangulo> crearConsulta() {
+    std::vector<Rectangulo> rectangulos;
+
+    for (int i = 0; i < 100; ++i) {
+        double x1 = rand() % 500001;               // generar un número entre 0 y 500000
+        double y1 = rand() % 500001;
+        double ancho = rand() % 100001;            // generar un número entre 0 y 100000 para el ancho
+        double alto = rand() % 100001;             // generar un número entre 0 y 100000 para el alto
+
+        rectangulos.push_back(Rectangulo(x1, y1, ancho, alto));
+    }
+
+    return rectangulos;
+}
+
+
+void realizarConsultasEnRTrees(const std::vector<std::string>& nombresArchivos) {
+    // Generar 100 consultas
+    std::vector<Rectangulo> consultas = crearConsulta();
+
+    // Abre el archivo para escritura
+    std::ofstream outFile("resultados_metodo1.csv");
+    if (!outFile.is_open()) {
+        std::cerr << "Error: No se pudo abrir el archivo de resultados." << std::endl;
+        return;
+    }
+
+    // Escribir encabezados en el archivo CSV
+    outFile << "Nombre del R-tree,Promedio de accesos,Tiempo promedio de consulta (segundos)\n";
+
+    for (const std::string& filename : nombresArchivos) {  // Para cada R-tree
+        int totalAccesos = 0;
+        auto inicio = std::chrono::high_resolution_clock::now();  // Inicio del cronómetro
+
+        for (const Rectangulo& C : consultas) {
+            int accesos = 0;
+            buscarRectangulosIntersectados(filename, C, accesos);
+            totalAccesos += accesos;
+        }
+
+        auto fin = std::chrono::high_resolution_clock::now();  // Fin del cronómetro
+        std::chrono::duration<double> tiempo = fin - inicio;  // Duración total de las 100 consultas
+
+        double promedioAccesos = static_cast<double>(totalAccesos) / 100.0;
+        double promedioTiempo = tiempo.count() / 100.0;  // Tiempo promedio por consulta
+
+        // Escribir resultados en el archivo CSV
+        outFile << filename << "," << promedioAccesos << "," << promedioTiempo << "\n";
+    }
+
+    outFile.close();  // Cierra el archivo de resultados
+}
+
 
 
 int main() {
 
-    //ver si pudimos escribir los rectangulos
-    escribirRectangulos(N, "rectangles.bin");
-    std::cout << "Se escribieron " << N << " rectangulos en rectangles.bin\n";               //1ra linea
+    std::vector<unsigned long long> numeros;
 
-
-    //este bloque de codigo es solo para chequear si ordenamos bien los rectangulos
-    std::string filename = "ordered-rectangles.bin";
-    ordenarRectangulosPorCentro("rectangles.bin", filename);
-    if (estanOrdenados("ordered-rectangles.bin")) {
-        std::cout << "Los rectangulos estan correctamente ordenados.\n";                    //2da linea
-        std::cout << "Se pusieron ordenados en ordered-rectangles.bin\n";                   //3ra linea 
+    for (int i = 10; i <= 25; ++i) {
+        numeros.push_back(pow(2, i));
     }
-    else {
-        std::cerr << "Los rectángulos no están ordenados.\n";
+    auto root = leerRTree("RTree_1.txt");
+    //imprimirRtree(root);
+
+    // Lista de los nombres de los archivos R-tree
+    std::vector<std::string> nombresArchivos;
+    for (int i = 0; i <= 15; ++i) {
+        nombresArchivos.push_back("RTree_" + std::to_string(i) + ".txt");
     }
 
-
-    //estas dos lineas solo revisa que se lean los rectangulos ORDENADOS desde el binario
-    //que los TENIA ordenados.
-    std::vector < Rectangulo > rectangles = leerRectangulos(filename);
-    std::cout << "Se leyeron los rectangulos de ordered-bin y se guardaron en un array\n"; //4ta linea
-
-
-
-
-
+    realizarConsultasEnRTrees(nombresArchivos);
 
     /*
-    HOLAAAAAAAA NATTT YA MIRA, CON ESTOS RECTANGULOS ESTOY HACIENDO LAS PRUEBAS, LO DE ARRIBA ES IRRELEVANTE POR AHORA PORQUE
-    YA SABEMOS QUE FUNCIONA
-    */
-    std::vector<Rectangulo> rectangulos = {
-        {10, 10, 20, 30},   // rect1
-        {25, 20, 10, 20},   // rect2
-        {5, 5, 15, 15},     // rect3
-        {60, 60, 20, 30},   // rect4
-        {35, 10, 10, 25},   // rect5
-        {20, 25, 15, 10},   // rect6
-        {10, 40, 15, 10},   // rect7
-        {70, 80, 20, 30},   // rect8
-        {85, 90, 10, 20},   // rect9
-        {95, 100, 15, 15},  // rect10
-        {110, 120, 20, 30}, // rect11
-        {130, 140, 10, 25}  // rect12
-    };
+    // Mostrar los números para verificar
+    for (unsigned long long num : numeros) {
+        std::cout << num << std::endl;
 
+        // Crear el nombre del archivo basado en el número actual
+        std::string filename = "rectangles" + std::to_string(num) + ".bin";
 
-    // PARA MAS COMPROBACION DE LO ANTERIOR.
-    // en esta las lineas.
-    // imprimimos todos los rectangulos ordenados.}
+        // Escribir los rectángulos para cada número
+        escribirRectangulos(num, filename);
+        std::cout << "Se escribieron " << num << " rectángulos en " << filename << "\n"; // 1ra línea
 
-    /*
-    hola DENUEVO NAT, ESTA PARTE SOLO CHEQUEO QUE SE ORDENEN BIEN LOS RECGANGULOS SEGUN SU CENTRO
-    PARA ESO SIRVE EL PRINT
-    nada mas k eso , NOS VEMOS EN EL SIGUIENTE COMENTARIIO
-    */
-    ordenarPorCentroX(rectangulos);
-    std::cout << "\nAhora los imprimimos ordenados (estos rectangulos serian las hojas)\n";                                    //5ta linea
-    for (const Rectangulo& rect : rectangulos) {
-        rect.imprimir();
-    }
-
-
-
-
-
-    /*
-    * ESTA PARTE ES SUPER IMPORTANTE, AQUI ARMO EL R TREE CON LOS RECTANGULOS ORDENADOS DE ANTES
-    * JUSTO ANTES DE QUE ESTO PRINTEE "Construido!" MUESTRA UN 6 EN LA TERMINAL
-    * ESO ES PORQUE EL CODIGO "construirRTree tiene un print de cuantos NODOS HOJA, ESO ES TODO
-    * ESE VALOR SIRVE PARA CHEQUEAR SI LA CANTIDAD DE NODOS HOJA QUE TIENE EL ARBOL TIENE SENTIDO
-    *
-    */
-    // Aqui construimos el R-tree EN RAM y lo imprimimos
-    std::cout << "\nComenzamos la construccion del R-tree\n";
-    Nodo* raiz = construirRtree(rectangulos);
-    std::cout << "Construido!\n";
-
-    /*
-    AQUI IMPRIMIMOS EL ARBOL QUE CREAMOS ANTES, SEGUN YO SE ESTA IMPRIMIENDO BIEN PERO
-    PERO IGUAL HAY QUE REVISAR QUE TENGO SENTIDO LO QUE SE ESTA IMPRIMIENDO
-    */
-    std::cout << "\nAHORA LO IMPRIMIMOS\n";
-    std::cout << "-----------------" << std::endl;
-    imprimirRTree2(raiz);
-
-
-    // este bloque es importante porque aqui guardamos el arbol anterior en.
-    // disco y lo volvimos a imprimir para comprobar que sea igual al anterior.
-
-    /*
-    ESTA PARTE ES IMPORTANTE, AQUI GUARDAMOS EL ARBOL QUE TENEMOS EN RAIZ EN EL ARCHIVO
-    EN TEORIA SI LOGRAMOS CONSTRUIR BIEN EL ARBOL LEERRTREE ES EVIDENTE QUE ESTARA CORRECCTA
-    */
-    std::cout << "\n\n";
-    guardarRTree(raiz, "Rtree.txt");
-    Nodo* raizLeida = leerRTree("Rtree.txt");
-    std::cout << "Arbol R leido del archivo, pero leido desde el archivo:\n";
-    std::cout << "--------------------------\n";
-
-    /*
-    * AQUI COMPRUEBO QUE LO QUE LEIMOS DEL ARCHIVO SEA LO MISMO QUE PRINTEAMOS ANTES, EFECTIVAMENTE SON IGUALKES
-    */
-    imprimirRtree(raizLeida, 0);
-    std::cout << "--------------------------\n";
-
-
-
-    /*
-    * AQUI CUENTO LOS NODOS, ESTA PARTE ME PERTURBA AKLHSDHJKLSD PÓRQUE SIEMPRE ME DA QUE HAY 1 NODO MAS :C
-    * SEGUN YO ES SOLAMENTE XQ LA RAIZ ENGLOBA A TODOS
-    */
-    int totalNodos = contarNodos(raizLeida);
-    std::cout << "El árbol tiene " << totalNodos << " nodos." << std::endl;
-
-
-    /*
-    * CONTADOR DE ACCESOS
-    */
-    int accesos = 0;
-    Rectangulo C = { 15, 15, 30, 35 };  // cubre el área desde (15,15) hasta (45,50)
-
-
-
-    /*
-    * AQUI ES LA CONSULTA Y SE IMPRIMEN LOS RECTANGULOS QUE FUERON INTERSECTADOS
-    */
-    //Rectangulo C(0.1,0.1, 499999.0, 499999.0 );  // Define tu rectángulo de consulta aquí.
-    std::vector<Rectangulo> rectangulosIntersectados = buscarRectangulosIntersectados("Rtree.txt", C, accesos);
-    std::cout << "Accesos a disco: " << accesos << std::endl;
-    
-    for (const Rectangulo& rect : rectangulosIntersectados) {
-        rect.imprimirDim();
-    }
-
-    /*
-    * pon esto en tu mainnn!!! 
-    */
-
-
-
-
-    /*
-    ESTO PARA ABAJO LO PUEDES IGNORAR
-    */
-
-
-    // Crear y mostrar grupos de rectángulos
-    std::cout << "\nAhora los agrupamos en grupos de tamano" << M << " y los imprimimos : \n";
-    std::vector < std::vector < Rectangulo >> grupos = agruparRectangulos(rectangles);
-    int numeroGrupo = 1; // Iniciar contador de grupos
-
-    
-    for (const auto& grupo : grupos) {
-        std::cout << "\n---- Grupo " << numeroGrupo << " ----\n";
-        for (const Rectangulo& rect : grupo) {
-            rect.imprimir();
+        // Ordenar los rectángulos y comprobar si están ordenados
+        std::string orderedFilename = "ordered-rectangles" + std::to_string(num) + ".bin";
+        ordenarRectangulosPorCentro(filename, orderedFilename);
+        if (estanOrdenados(orderedFilename)) {
+            std::cout << "Los rectángulos están correctamente ordenados.\n"; // 2da línea
+            std::cout << "Se pusieron ordenados en " << orderedFilename << "\n"; // 3ra línea
         }
-        std::cout << "--------------\n";
-        numeroGrupo++;
-    }
-    std::cout << "\n--------------------------" << "\n--------------------------\n";
-    
-
-
-    std::cout << "\n111111111111111111\n";
-    // Después de haber creado los grupos:
-    // 
-    //std::vector<Nodo> nodos = crearNodosDesdeGrupos(grupos); OJO AKI ESPERA RECIBIR VECTOR NODO NO UN VECTOR NODO*
-
-    //
-
-    /*
-    std::cout << "Aqui los grupos que creamos antes los transformamos en nodos!\n";
-    std::cout << "Se crearon " << nodos.size() << " nodos." << std::endl;
-    std::cout << "\n--------------------------\n";
-    
-    */
-    
-    /*
-    std::cout << "\nprinteamos los hijos de cada unos de estos nodos\n";
-    for (size_t i = 0; i < nodos.size(); ++i) {
-        std::cout << "Nodo " << (i + 1) << " tiene los siguientes hijos:\n";
-        for (const Entrada& entrada : nodos[i].entradas) {
-            if (entrada.hijo) {
-                // Si tienes alguna forma de identificar cada nodo, la puedes imprimir aquí.
-                // Por simplicidad, aquí solo indicamos que hay un hijo.
-                std::cout << "  - Tiene un hijo\n";
-              
-
-            }
-            else {
-                // No hay hijo, solo es una entrada de hoja.
-                entrada.mbr.imprimir();
-            }
+        else {
+            std::cerr << "Los rectángulos no están ordenados.\n";
         }
-        std::cout << "------------------------\n";
+    }
+
+    */
+
+    //std::vector<std::vector<Rectangulo>*> vectoresDeRectangulos = cargarVectoresDesdeArchivos(numeros);
+
+
+    //std::vector<Nodo*> rtrees = construirRTreesDesdeVectores(vectoresDeRectangulos);
+
+    //guardarTodosLosRTrees(rtrees);
+
+    /*
+    for (size_t i = 0; i < vectoresDeRectangulos.size(); ++i) {
+        std::cout << "Tamaño del vector correspondiente a " << numeros[i] << " rectángulos: ";
+        std::cout << vectoresDeRectangulos[i]->size() << std::endl;
+    }
+
+    // No olvides liberar la memoria en el heap al final
+    for (std::vector<Rectangulo>* vector : vectoresDeRectangulos) {
+        delete vector;
+    }
+
+
+    for (Nodo* rtree : rtrees) {
+        delete rtree;
     }
     */
 
-    /*
-    //Aqui calculamos el MBR de cada uno de los nodos que creamos antes y los ordenamos, obviamente
-    std::cout << "\nAqui calculamos el MBR de cada uno de los nodos que creamos antes y los ordenamos, obviamente\n";
-    std::vector<Rectangulo> rectangulosMBRS = calcularMBRsDeNodos(nodos); //ESTAN DESORDENADOS.
-    ordenarPorCentroX(rectangulosMBRS);
-    // Imprimir rectángulos MBRS de 
-    */
+    //ordenarTodosLosRectangulosPorHilbert(numeros);
+
+
     
-    /*
-    std::cout << "\nAhora los imprimimos \n" << "--------------------------\n";
-    for (const Rectangulo& rect : rectangulosMBRS) {
-        rect.imprimir();
-    }
-    std::cout << "--------------------------\n";
-    */
 
 
 
-
-    std::cout << "Esta ultima parte es mas que nada para comprobar\nque se estaba haciendo bien el procedimiento\n";
-
-    //imprimirMBRsDeNodos(nodos);
-
-    std::cout << "--------------------------\n";
 
     return 0;
 }
