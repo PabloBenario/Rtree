@@ -11,6 +11,23 @@
 #include <algorithm>
 #include <cmath>
 
+/*
+* 
+* Aqui implementamos la funcion que ordena un archivo de rectangulos y los devuelve ordenados
+* en otro archivo segun el metodo 3
+* 
+* lamentablemente no nos funciono y tuvimos errores particularmente extraños que no pudimos depurar
+* fue muy triste, perdimos mucho tiempo, sin embargo lo pusimos porque creemos que se logro captar la idea
+* 
+* si se hubiera retornado el archivo ordenado hubiera bastado hacer el mismo procedimiento de armar los rtree que se 
+* hizo con el metodo 1
+* 
+* 
+*/
+
+
+
+
 struct Punto {
     double x;
     double y;

@@ -61,10 +61,6 @@ void leerYImprimirRectangulos(const std::string& nombreArchivo) {
 }
 
 
-// Función auxiliar para obtener la coordenada X del centro de un rectángulo.
-double centroX(const Rectangulo& rect) {
-    return rect.getCenterX();
-}
 
 /**
  * @brief Toma un archivo binario de rectángulos y crea un nuevo archivo con los rectángulos ordenados por el centro.
@@ -154,11 +150,6 @@ std::vector<Rectangulo> leerRectangulos(const std::string& nombreArchivo) {
 
     return rectangles;
 }
-
-
-
-
-
 
 
 

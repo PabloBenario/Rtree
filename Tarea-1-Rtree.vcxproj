@@ -26,7 +26,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ArchivosRectangulo.h" />
+    <ClInclude Include="auxFuncMain.h" />
     <ClInclude Include="AuxFunctions.h" />
+    <ClInclude Include="estruct3.h" />
+    <ClInclude Include="hilbert.h" />
     <ClInclude Include="Rectangulo.h" />
   </ItemGroup>
   <ItemGroup>

@@ -1,4 +1,8 @@
 #include "AuxFunctions.h"
+
+//funciones auxiliares, aveces sirvieron pero muy poco
+// las fuimos dejando aca mientras desarollabamos
+
 Rectangulo Nodo::calcularMBR() const {
     if (entradas.empty()) {
         return Rectangulo();  // Retorna un rectángulo vacío si no hay entradas.

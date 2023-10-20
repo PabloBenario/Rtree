@@ -4,6 +4,7 @@
 #include <algorithm>  // Para std::min y std::max
 #include "Rectangulo.h"
 
+//aqui definimos la estructura del nodo de nuestro rtree
 
 struct Nodo;  // Pre-declaración.
 

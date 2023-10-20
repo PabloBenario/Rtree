@@ -10,6 +10,19 @@
 #include <random>
 #include <algorithm>
 
+
+
+/*
+
+Aca implementamos el ordenamiento de los rectangulos pero siguiendo una curva del hilber, 
+lamentablementye tuvimos el mismo error que con la estructura 3 ´no pudimos depurarlo, sin embargo
+pudimos hacer una funcion que podia ordenar rectangulus y sus puntos segun su posicion en la curva
+de hilbert, una vez que hubier5amos tenido los rectangulos ordenados era analogo a seguir los pasos del metodo 1
+
+
+*/
+
+
 // Estructura para representar un punto en el plano
 struct Point {
     int x, y;
